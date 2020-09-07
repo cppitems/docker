@@ -15,9 +15,9 @@ docker pull quay.io/manstetten/theia-cpp:latest
 2.1 prepare working dirctory permissions
 ```bash
 cd workingdir
-sudo groupadd --gid 5555 theia # create new group 'theia'
-sudo usermod -a -G theia $(id -un) # append current user to group 'theia'
-sudo chown -R :theia ./  # change ownership to the new theia group
+sudo groupadd --gid 5555 theiaide # create new group 'theiaide'
+sudo usermod -a -G theiaide $(id -un) # append current user to group 'theiaide'
+sudo chown -R :theiaide ./  # change ownership to the new theiaide group
 sudo chmod -R 775 ./ # make accessible 
 sudo chmod g+s ./ # make all future content inherit ownership
 ```
