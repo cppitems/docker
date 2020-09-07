@@ -25,7 +25,7 @@ sudo chmod g+s ./ # make all future content inherit ownership
 3. start theia backend server
 ```bash
 # cd into folder (working dirctory) where your project lives (do not start in Home-folder as a lot of file-precaching happens then)
-docker run --init -it -p 3000 -v "$(pwd):/home/project:cached" quay.io/manstetten/theia-cpp:latest  
+docker run --init -it -p 3000:3000 -v "$(pwd):/home/project:cached" quay.io/manstetten/theia-cpp:latest  
 # when running memory sanitizer & co
 #docker run --init -it -p 3000:3000 --cap-add SYS_PTRACE -v "$(pwd):/home/project:cached" quay.io/manstetten/theia-cpp:latest 
 ```
