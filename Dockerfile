@@ -119,7 +119,10 @@ RUN set -ex \
 WORKDIR /
 
 ## User account
-RUN adduser --disabled-password --gecos '' theia
+# https://medium.com/@nielssj/docker-volumes-and-file-system-permissions-772c1aee23ca
+RUN addgroup --gid 5555 mygroup
+RUN adduser --disabled-password --gecos ''  theia
+RUN usermod -a -G theia theia
 
 RUN chmod g+rw /home && \
     mkdir -p /home/project && \
