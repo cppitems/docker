@@ -120,16 +120,20 @@ WORKDIR /
 
 ## User account
 # https://medium.com/@nielssj/docker-volumes-and-file-system-permissions-772c1aee23ca
-RUN addgroup --gid 5555 mygroup
-RUN adduser --disabled-password --gecos ''  theia
-RUN usermod -a -G theia theia
+
+RUN addgroup --gid 5555 theiaide
+RUN adduser --disabled-password --gecos "" --uid 5555 --ingroup theiaide theia  
+RUN usermod -a -G theiaide theia
+# RUN useradd  -a -G theia theia
+RUN cat /etc/group | grep theia
+RUN cat /etc/passwd | grep theia
 
 RUN chmod g+rw /home && \
     mkdir -p /home/project && \
-    chown -R theia:theia /home/theia && \
+    chown -R theia:theiaide /home/theia && \
     mkdir -p /home/theia/theia && \
-    chown -R theia:theia /home/theia/theia && \
-    chown -R theia:theia /home/project;
+    chown -R theia:theiaide /home/theia/theia && \
+    chown -R theia:theiaide /home/project;
 
 USER theia
 WORKDIR /home/theia
