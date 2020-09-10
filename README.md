@@ -7,6 +7,8 @@ https://docs.docker.com/engine/install/ubuntu/
 windows
 https://docs.docker.com/docker-for-windows/install/
 
+
+
 2. pull image 
 ```bash
 docker pull quay.io/manstetten/theia-cpp:latest
@@ -33,3 +35,14 @@ docker run --init -it -p 3000:3000 -v "$(pwd):/home/project:cached" quay.io/mans
 4. access theia IDE using your browser and the uri http://localhost:3000
 
 
+
+
+5. how to build docker image
+```bash
+# cd to root folder of this reppo
+docker build -f Dockerfile -t theia-cpp .
+# or without cache
+docker build --no-cache -f Dockerfile -t theia-cpp .
+# run local image
+docker run --init -it -p 3000:3000 -v "$(pwd):/home/project:cached" theia-cpp:latest
+```
