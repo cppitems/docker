@@ -1,0 +1,3 @@
+# Wasmer
+export WASMER_DIR="/home/theia/.wasmer"
+[ -s "$WASMER_DIR/wasmer.sh" ] && source "$WASMER_DIR/wasmer.sh"

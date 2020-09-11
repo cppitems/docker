@@ -32,14 +32,17 @@ RUN wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add - && \
 					   libc++-$LLVM-dev \
 					   libc++abi-$LLVM-dev \
 					   lldb-$LLVM \
+                       lld-$LLVM \
                        gcc-multilib \
                        g++-multilib \
                        gdb && \
     ln -s /usr/bin/llvm-nm-$LLVM /usr/bin/llvm-nm && \
 	ln -s /usr/bin/llvm-ar-$LLVM /usr/bin/llvm-ar && \
+    ln -s /usr/bin/lld-$LLVM /usr/bin/lld && \
     ln -s /usr/bin/clang-$LLVM /usr/bin/clang && \
     ln -s /usr/bin/clang++-$LLVM /usr/bin/clang++ && \
     ln -s /usr/bin/clang-cl-$LLVM /usr/bin/clang-cl && \
+    ln -s /usr/bin/clang-check-$LLVM /usr/bin/clang-check && \
     ln -s /usr/bin/clang-cpp-$LLVM /usr/bin/clang-cpp && \
     ln -s /usr/bin/clang-tidy-$LLVM /usr/bin/clang-tidy && \
     ln -s /usr/bin/clangd-$LLVM /usr/bin/clangd
@@ -135,8 +138,26 @@ RUN chmod g+rw /home && \
     chown -R theia:theiaide /home/theia/theia && \
     chown -R theia:theiaide /home/project;
 
+COPY .bashrc.append /home/theia/.bashrc.append
+RUN cat /home/theia/.bashrc.append >> /home/theia/.bashrc
+
+## wasi sysroot
+# https://github.com/jedisct1/libclang_rt.builtins-wasm32.a
+# https://00f.net/2019/04/07/compiling-to-webassembly-with-llvm-and-clang/
+RUN mkdir /opt/wasm 
+WORKDIR /opt/wasm
+RUN wget https://github.com/WebAssembly/wasi-sdk/releases/download/wasi-sdk-10/wasi-sysroot-10.0.tar.gz 
+RUN tar -xvf wasi-sysroot-10.0.tar.gz
+RUN wget https://github.com/WebAssembly/wasi-sdk/releases/download/wasi-sdk-10/libclang_rt.builtins-wasm32-wasi-10.0.tar.gz
+RUN tar -xvf libclang_rt.builtins-wasm32-wasi-10.0.tar.gz
+
+
+
 USER theia
+
 WORKDIR /home/theia
+# install wasm runtime
+RUN curl https://get.wasmer.io -sSfL | sh
 RUN ls -la
 
 # clone custom theia
@@ -150,6 +171,16 @@ yarn theia download:plugins
 
 WORKDIR /home/theia/theia
 # RUN rm -rf node_modules/
+
+RUN cat /home/theia/.bashrc
+
+USER root
+RUN ln -s /usr/bin/wasm-ld-$LLVM /usr/bin/wasm-ld
+RUN tar -xvf /opt/wasm/libclang_rt.builtins-wasm32-wasi-10.0.tar.gz -C /usr/lib/llvm-10/lib/clang/10.0.0/
+USER theia
+
+COPY .bashrc.wasmer /home/theia/.bashrc.wasmer
+RUN cat /home/theia/.bashrc.wasmer >> /home/theia/.bashrc
 
 EXPOSE 3000
 ENV SHELL=/bin/bash \
