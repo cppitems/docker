@@ -29,6 +29,7 @@ RUN wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add - && \
                        clang-tools-$LLVM \
                        clangd-$LLVM \
                        clang-tidy-$LLVM \
+                       clang-format-$LLVM \
 					   libc++-$LLVM-dev \
 					   libc++abi-$LLVM-dev \
 					   lldb-$LLVM \
@@ -43,6 +44,7 @@ RUN wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add - && \
     ln -s /usr/bin/clang++-$LLVM /usr/bin/clang++ && \
     ln -s /usr/bin/clang-cl-$LLVM /usr/bin/clang-cl && \
     ln -s /usr/bin/clang-check-$LLVM /usr/bin/clang-check && \
+    ln -s /usr/bin/clang-format-$LLVM /usr/bin/clang-format && \
     ln -s /usr/bin/clang-cpp-$LLVM /usr/bin/clang-cpp && \
     ln -s /usr/bin/clang-tidy-$LLVM /usr/bin/clang-tidy && \
     ln -s /usr/bin/clangd-$LLVM /usr/bin/clangd
@@ -172,15 +174,20 @@ yarn theia download:plugins
 WORKDIR /home/theia/theia
 # RUN rm -rf node_modules/
 
-RUN cat /home/theia/.bashrc
-
 USER root
 RUN ln -s /usr/bin/wasm-ld-$LLVM /usr/bin/wasm-ld
 RUN tar -xvf /opt/wasm/libclang_rt.builtins-wasm32-wasi-10.0.tar.gz -C /usr/lib/llvm-10/lib/clang/10.0.0/
 USER theia
 
+
+RUN git config --global user.email "" 
+RUN git config --global user.name "theia"
+RUN git config core.fileMode false
+
 COPY .bashrc.wasmer /home/theia/.bashrc.wasmer
 RUN cat /home/theia/.bashrc.wasmer >> /home/theia/.bashrc
+
+RUN cat /home/theia/.bashrc
 
 EXPOSE 3000
 ENV SHELL=/bin/bash \
