@@ -182,7 +182,7 @@ USER theia
 
 RUN git config --global user.email "" 
 RUN git config --global user.name "theia"
-RUN git config core.fileMode false
+RUN git config --global core.filemode false
 
 COPY .bashrc.wasmer /home/theia/.bashrc.wasmer
 RUN cat /home/theia/.bashrc.wasmer >> /home/theia/.bashrc
