@@ -177,8 +177,16 @@ WORKDIR /home/theia/theia
 USER root
 RUN ln -s /usr/bin/wasm-ld-$LLVM /usr/bin/wasm-ld
 RUN tar -xvf /opt/wasm/libclang_rt.builtins-wasm32-wasi-10.0.tar.gz -C /usr/lib/llvm-10/lib/clang/10.0.0/
-USER theia
 
+WORKDIR /opt
+RUN git clone --branch llvmorg-10.0.1 --depth 1 https://github.com/llvm/llvm-project
+RUN cd llvm-project/ && mkdir build && mkdir install 
+WORKDIR /opt/llvm-project/build
+RUN cmake -DLIBOMP_TSAN_SUPPORT=1 -DCMAKE_INSTALL_PREFIX=/opt/llvm-project/install ../openmp
+RUN make install
+
+USER theia
+WORKDIR /home/theia/theia
 
 RUN git config --global user.email "" 
 RUN git config --global user.name "theia"
