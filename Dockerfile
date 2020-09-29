@@ -185,7 +185,7 @@ WORKDIR /opt/llvm-project/build
 RUN cmake -DLIBOMP_TSAN_SUPPORT=1 -DCMAKE_INSTALL_PREFIX=/opt/llvm-project/install ../openmp
 RUN make install
 
-
+# install clang-def and cppinsights
 RUN apt-get update && apt-get install -y clang++-10-dev
 RUN mkdir -p /opt/cppins/build
 ENV PATH="/usr/lib/llvm-10/bin:${PATH}"
@@ -196,6 +196,10 @@ WORKDIR "/opt/cppins/build"
 RUN cmake -G"Unix Makefiles" -DCMAKE_CXX_COMPILER=clang++  ../cppinsights
 RUN make
 ENV PATH="/opt/cppins/build:${PATH}"
+
+# make group+rwx on file creation 
+RUN apt-get -y install acl 
+RUN setfacl -R -dm g::rwx /home/project 
 
 USER theia
 WORKDIR /home/theia/theia
