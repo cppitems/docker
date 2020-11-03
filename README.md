@@ -14,14 +14,7 @@ docker pull quay.io/manstetten/theia-cpp:latest
 ```
 
 ### 2.1 prepare working dirctory permissions
-```bash
-cd workingdir
-sudo groupadd --gid 5555 theiaide # create new group 'theiaide'
-sudo usermod -a -G theiaide $(id -un) # append current user to group 'theiaide'
-sudo chown -R :theiaide ./  # change ownership to the new theiaide group
-sudo chmod -R 775 ./ # make accessible 
-sudo chmod g+s ./ # make all future content inherit ownership
-```
+If the uid/gid of your local user on the host is not 1000/1000, change the dockerfile to match your uid/gid to avoid any permission changes on the host.
 
 ## 3. start theia backend server
 ```bash
@@ -42,3 +35,14 @@ docker build --no-cache -f Dockerfile -t theia-cpp .
 # run local image
 docker run --init -it -p 3000:3000 -v "$(pwd):/home/project:cached" theia-cpp:latest
 ```
+
+
+>### (2.1 **original idea, to cumbersome in pratice** prepare working dirctory permissions)
+>```bash
+>cd workingdir
+>sudo groupadd --gid 5555 theiaide # create new group 'theiaide'
+>sudo usermod -a -G theiaide $(id -un) # append current user to group 'theiaide'
+>sudo chown -R :theiaide ./  # change ownership to the new theiaide group
+>sudo chmod -R 775 ./ # make accessible 
+>sudo chmod g+s ./ # make all future content inherit ownership
+>``` 

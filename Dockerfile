@@ -8,9 +8,17 @@ ARG LLVM=10
 ENV NODE_VERSION $NODE_VERSION
 ENV YARN_VERSION 1.13.0
 
+# default uid
+ARG host_uid=1000 
+ENV env_host_uid=$host_uid
+# default gid
+ARG host_gid=1000 
+ENV env_host_gid=$host_gid
+
 #Common deps
 RUN apt-get update && \
     apt-get -y install build-essential \
+                       libstdc++6 \
                        curl \
                        git \
                        gpg \
@@ -126,8 +134,10 @@ WORKDIR /
 ## User account
 # https://medium.com/@nielssj/docker-volumes-and-file-system-permissions-772c1aee23ca
 
-RUN addgroup --gid 5555 theiaide
-RUN adduser --disabled-password --gecos "" --uid 5555 --ingroup theiaide theia  
+# better approach: change to this: https://stackoverflow.com/questions/44683119/dockerfile-replicate-the-host-user-uid-and-gid-to-the-image
+
+RUN addgroup --gid ${env_host_gid} theiaide
+RUN adduser --disabled-password --gecos "" --uid ${env_host_uid} --ingroup theiaide theia  
 RUN usermod -a -G theiaide theia
 # RUN useradd  -a -G theia theia
 RUN cat /etc/group | grep theia
@@ -146,12 +156,12 @@ RUN cat /home/theia/.bashrc.append >> /home/theia/.bashrc
 ## wasi sysroot
 # https://github.com/jedisct1/libclang_rt.builtins-wasm32.a
 # https://00f.net/2019/04/07/compiling-to-webassembly-with-llvm-and-clang/
-RUN mkdir /opt/wasm 
-WORKDIR /opt/wasm
-RUN wget https://github.com/WebAssembly/wasi-sdk/releases/download/wasi-sdk-10/wasi-sysroot-10.0.tar.gz 
-RUN tar -xvf wasi-sysroot-10.0.tar.gz
-RUN wget https://github.com/WebAssembly/wasi-sdk/releases/download/wasi-sdk-10/libclang_rt.builtins-wasm32-wasi-10.0.tar.gz
-RUN tar -xvf libclang_rt.builtins-wasm32-wasi-10.0.tar.gz
+#RUN mkdir /opt/wasm 
+#WORKDIR /opt/wasm
+#RUN wget https://github.com/WebAssembly/wasi-sdk/releases/download/wasi-sdk-10/wasi-sysroot-10.0.tar.gz 
+#RUN tar -xvf wasi-sysroot-10.0.tar.gz
+#RUN wget https://github.com/WebAssembly/wasi-sdk/releases/download/wasi-sdk-10/libclang_rt.builtins-wasm32-wasi-10.0.tar.gz
+#RUN tar -xvf libclang_rt.builtins-wasm32-wasi-10.0.tar.gz
 
 
 
@@ -159,8 +169,8 @@ USER theia
 
 WORKDIR /home/theia
 # install wasm runtime
-RUN curl https://get.wasmer.io -sSfL | sh
-RUN ls -la
+#RUN curl https://get.wasmer.io -sSfL | sh
+#RUN ls -la
 
 # clone custom theia
 RUN git clone --branch pmans --depth 1 https://github.com/cppitems/theia.git ./theia
@@ -175,8 +185,8 @@ WORKDIR /home/theia/theia
 # RUN rm -rf node_modules/
 
 USER root
-RUN ln -s /usr/bin/wasm-ld-$LLVM /usr/bin/wasm-ld
-RUN tar -xvf /opt/wasm/libclang_rt.builtins-wasm32-wasi-10.0.tar.gz -C /usr/lib/llvm-10/lib/clang/10.0.0/
+#RUN ln -s /usr/bin/wasm-ld-$LLVM /usr/bin/wasm-ld
+#RUN tar -xvf /opt/wasm/libclang_rt.builtins-wasm32-wasi-10.0.tar.gz -C /usr/lib/llvm-10/lib/clang/10.0.0/
 
 WORKDIR /opt
 RUN git clone --branch llvmorg-10.0.1 --depth 1 https://github.com/llvm/llvm-project
@@ -208,8 +218,8 @@ RUN git config --global user.email ""
 RUN git config --global user.name "theia"
 RUN git config --global core.filemode false
 
-COPY .bashrc.wasmer /home/theia/.bashrc.wasmer
-RUN cat /home/theia/.bashrc.wasmer >> /home/theia/.bashrc
+#COPY .bashrc.wasmer /home/theia/.bashrc.wasmer
+#RUN cat /home/theia/.bashrc.wasmer >> /home/theia/.bashrc
 
 RUN cat /home/theia/.bashrc
 
