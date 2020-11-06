@@ -14,6 +14,8 @@ ENV env_host_uid=$host_uid
 # default gid
 ARG host_gid=1000 
 ENV env_host_gid=$host_gid
+RUN echo $env_host_gid
+RUN echo $env_host_uid
 
 #Common deps
 RUN apt-get update && \
@@ -27,6 +29,9 @@ RUN apt-get update && \
                        pkg-config libx11-dev libxkbfile-dev libsecret-1-dev \                     
                        xz-utils && \
     rm -rf /var/lib/apt/lists/*
+
+RUN apt-get update && \
+    apt-get install build-essential libopenblas-base libopenblas-dev libeigen3-dev    
 
 # install clangd and clang-tidy from the public LLVM PPA (nightly build / development version)
 # and also the GDB debugger from the Ubuntu repos
@@ -209,6 +214,7 @@ ENV PATH="/opt/cppins/build:${PATH}"
 
 # make group+rwx on file creation 
 RUN apt-get -y install acl 
+RUN apt-get -y install liblapacke-dev
 RUN setfacl -R -dm g::rwx /home/project 
 
 USER theia
